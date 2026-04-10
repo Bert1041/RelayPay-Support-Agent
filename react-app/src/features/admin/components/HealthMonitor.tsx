@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/shared/lib/supabase";
 import { 
   RefreshCw, 
@@ -64,7 +64,6 @@ export const HealthMonitor = () => {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [showToast, setShowToast] = useState(false);
-  const transcriptScrollRef = useRef<HTMLDivElement>(null);
 
   const fetchHealth = async () => {
     setLoading(true);
@@ -352,9 +351,3 @@ export const HealthMonitor = () => {
     </div>
   );
 };
-
-const ClockIcon = ({ className }: { className?: string }) => (
-  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-  </svg>
-);

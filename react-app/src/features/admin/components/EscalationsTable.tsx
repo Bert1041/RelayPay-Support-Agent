@@ -60,7 +60,7 @@ const MOCK_ESCALATIONS: EscalationEntry[] = [
 
 export const EscalationsTable = () => {
   const [escalations, setEscalations] = useState<EscalationEntry[]>(MOCK_ESCALATIONS);
-  const [loading, setLoading] = useState(false);
+  const [, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");

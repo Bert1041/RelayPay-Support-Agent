@@ -1,4 +1,4 @@
-import { LayoutDashboard, FileText, Settings, LogOut, ChevronLeft, ChevronRight, AlertTriangle, ShieldCheck, Database, Volume2 } from "lucide-react";
+import { LayoutDashboard, FileText, LogOut, ChevronLeft, ChevronRight, AlertTriangle, ShieldCheck, Database, Volume2 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/components/ui/button";

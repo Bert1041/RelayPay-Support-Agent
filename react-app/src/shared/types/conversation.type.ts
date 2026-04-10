@@ -18,6 +18,7 @@ export enum TranscriptMessageTypeEnum {
 
 export interface BaseMessage {
   type: MessageTypeEnum;
+  role?: MessageRoleEnum;
 }
 
 export interface TranscriptMessage extends BaseMessage {

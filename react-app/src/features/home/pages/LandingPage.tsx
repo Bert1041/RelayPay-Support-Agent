@@ -3,7 +3,6 @@
 import { Link } from "react-router-dom";
 import { Headphones, MessageSquare, ArrowRight, ShieldCheck, Zap, Globe } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
-import { cn } from "@/shared/lib/utils";
 
 export default function LandingPage() {
   return (

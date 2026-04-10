@@ -1,20 +1,17 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/shared/lib/supabase";
-import { 
-  FileText, 
-  Database, 
-  Search, 
-  Plus, 
-  Trash2, 
-  ExternalLink,
+import {
+  FileText,
+  Database,
+  Search,
   ChevronRight,
   Layers,
   X,
   Copy,
   Clock,
-  CloudUpload,
   RefreshCw,
-  FolderOpen
+  FolderOpen,
+  CheckCircle2
 } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import { cn } from "@/shared/lib/utils";
@@ -57,7 +54,7 @@ const GDRIVE_FOLDER_URL = `https://drive.google.com/drive/folders/${GDRIVE_FOLDE
 
 export const KnowledgeBaseView = () => {
   const [documents, setDocuments] = useState<DocumentMetadata[]>(MOCK_DOCS);
-  const [loading, setLoading] = useState(false);
+  const [, setLoading] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDoc, setSelectedDoc] = useState<DocumentMetadata | null>(null);

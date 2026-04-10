@@ -3,7 +3,6 @@ import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/shared/lib/supabase";
 import { Button } from "@/shared/components/ui/button";
 import { cn } from "@/shared/lib/utils";
-import { ScrollArea } from "@/shared/components/ui/scroll-area";
 
 interface ConversationLog {
   id: string;
