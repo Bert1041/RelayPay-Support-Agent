@@ -32,7 +32,7 @@ export default function LandingPage() {
         </div>
         <Link to="/admin">
           <Button variant="outline" className="border-[#14213D]/10 hover:bg-[#14213D]/5 text-[#14213D]/80 rounded-full px-6">
-            Admin Log
+            Admin
           </Button>
         </Link>
       </nav>

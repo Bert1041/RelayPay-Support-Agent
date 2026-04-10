@@ -19,6 +19,7 @@ import {
   ShieldCheck,
   SignalHigh,
   CalendarDays,
+  Wifi,
 } from "lucide-react";
 import { useVapi, CallStatus } from "@/features/assistant/hooks/useVapi";
 import { vapi } from "@/features/assistant/vapi.sdk";
@@ -135,13 +136,58 @@ export default function RuixenMoonChat() {
     }
   }, [isInactive, clearMessages, adjustHeight]);
 
+  const [networkQuality, setNetworkQuality] = useState<{
+    status: "Optimal" | "Good" | "Fair" | "Poor";
+    rtt: number;
+    isSlow: boolean;
+  }>({ status: "Good", rtt: 0, isSlow: false });
+
+  useEffect(() => {
+    const updateNetworkInfo = () => {
+      const conn = (navigator as any).connection;
+      if (conn) {
+        const rtt = conn.rtt || 0;
+        const type = conn.effectiveType;
+        let status: "Optimal" | "Good" | "Fair" | "Poor" = "Good";
+        
+        if (type === '4g' && rtt < 100) status = "Optimal";
+        else if (type === '4g' && rtt < 300) status = "Good";
+        else if (type === '3g' || (rtt >= 300 && rtt < 600)) status = "Fair";
+        else status = "Poor";
+
+        setNetworkQuality({ 
+          status, 
+          rtt, 
+          isSlow: status === "Fair" || status === "Poor" 
+        });
+      }
+    };
+
+    const conn = (navigator as any).connection;
+    if (conn) {
+      updateNetworkInfo();
+      conn.addEventListener('change', updateNetworkInfo);
+      return () => conn.removeEventListener('change', updateNetworkInfo);
+    }
+  }, []);
+
   const isDetailsCaptured = useCallback(() => {
-    // Robust detection for email patterns in any message turn
+    // Detects email patterns
     const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
-    return messages.some(m => {
+    // Detects potential full names (at least two words with 2+ characters each)
+    const nameRegex = /\b[A-Za-z]{2,}(?:\s+[A-Za-z]{2,})+\b/;
+    
+    let hasEmail = false;
+    let hasName = false;
+
+    messages.forEach(m => {
       const text = (m.type === MessageTypeEnum.TRANSCRIPT) ? m.transcript : (m as any).content;
-      return emailRegex.test(text || "");
+      const cleanText = text || "";
+      if (emailRegex.test(cleanText)) hasEmail = true;
+      if (nameRegex.test(cleanText)) hasName = true;
     });
+
+    return hasEmail && hasName;
   }, [messages]);
 
   // Handle Session Termination
@@ -164,8 +210,9 @@ export default function RuixenMoonChat() {
   // Robust Intent Detection: Show calendar when callback/schedule/time is mentioned
   useEffect(() => {
     const keywords = ["callback", "schedule", "appointment", "call you back", "booking", "pick a time", "preferred time"];
-    
-    // Check finished messages (Turn-based suppression)
+    const detailsCompleted = isDetailsCaptured();
+
+    // Check finished messages (Finalized turn suppression)
     if (messages.length > 0) {
       const lastIndex = messages.length - 1;
       const lastMessage = messages[lastIndex];
@@ -174,12 +221,10 @@ export default function RuixenMoonChat() {
         const text = (lastMessage.type === MessageTypeEnum.TRANSCRIPT) ? lastMessage.transcript : (lastMessage as any).content;
         const lowerText = text?.toLowerCase() || "";
         
-        // Don't pop if the USER just confirmed a schedule in the previous turn
+        // Suppression: If user just scheduled, or if it's already open, ignore
         const prevUserMessage = messages[lastIndex - 1];
         const userJustScheduled = prevUserMessage?.role === MessageRoleEnum.USER && 
                                 (prevUserMessage as any).content?.toLowerCase().includes("schedule the callback");
-
-        const detailsCompleted = isDetailsCaptured();
 
         if (keywords.some(k => lowerText.includes(k)) && !showCalendar && !userJustScheduled && detailsCompleted) {
           setShowCalendar(true);
@@ -189,14 +234,15 @@ export default function RuixenMoonChat() {
     }
 
     // Check active transcript (Instant reaction)
+    // We treat messages.length as the turn ID for the 'incoming' message
     if (activeTranscript && activeTranscript.role === MessageRoleEnum.ASSISTANT && messages.length > lastTriggeredIndex) {
       const lowerText = activeTranscript.transcript?.toLowerCase() || "";
-      const detailsCompleted = isDetailsCaptured();
 
       if (keywords.some(k => lowerText.includes(k)) && !showCalendar && detailsCompleted) {
-        // Only trigger if this specific text hasn't been "sent" to a finalized message yet
         setShowCalendar(true);
-        // We don't set lastTriggeredIndex here because the message index hasn't updated yet
+        // CRITICAL HARDENING: Mark this 'turn index' as triggered immediately to prevent re-popups 
+        // from the same transcript buffer after a manual close.
+        setLastTriggeredIndex(messages.length);
       }
     }
   }, [messages, activeTranscript, showCalendar, lastTriggeredIndex, isDetailsCaptured]);
@@ -429,7 +475,41 @@ export default function RuixenMoonChat() {
                   </div>
                   <span className="text-xs font-black text-[#14213D]">0.4ms</span>
                 </div>
+
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-amber-500/10 rounded-lg">
+                      <Wifi className={cn("w-4 h-4", networkQuality.isSlow ? "text-amber-600 animate-pulse" : "text-amber-500")} />
+                    </div>
+                    <span className="text-xs font-bold text-[#14213D]/60 uppercase tracking-widest">Link Quality</span>
+                  </div>
+                  <div className="text-right">
+                    <span className={cn(
+                      "text-[10px] font-black uppercase px-2 py-0.5 rounded-md border",
+                      networkQuality.status === "Optimal" || networkQuality.status === "Good" 
+                        ? "bg-green-50 text-green-700 border-green-100" 
+                        : "bg-amber-50 text-amber-700 border-amber-100"
+                    )}>
+                      {networkQuality.status}
+                    </span>
+                    {networkQuality.rtt > 0 && (
+                      <span className="block text-[8px] font-bold text-[#14213D]/30 mt-1 uppercase">{networkQuality.rtt}ms RTT</span>
+                    )}
+                  </div>
+                </div>
               </div>
+
+              {networkQuality.isSlow && (
+                <div className="p-4 bg-amber-50 border border-amber-100 rounded-xl flex items-start gap-3 animate-in fade-in slide-in-from-top-2">
+                  <div className="p-1 bg-white rounded-md border border-amber-100">
+                    <Zap className="w-3 h-3 text-amber-500" />
+                  </div>
+                  <p className="text-[10px] leading-relaxed text-amber-900 font-medium">
+                    <span className="font-black uppercase tracking-widest block mb-0.5">AI Latency Expected</span>
+                    Unstable connection detected. Assistant response speed may be restricted by network throughput.
+                  </p>
+                </div>
+              )}
             </div>
 
             <div className="space-y-4">

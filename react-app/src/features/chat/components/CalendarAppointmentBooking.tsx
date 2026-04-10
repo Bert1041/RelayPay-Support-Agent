@@ -17,7 +17,7 @@ const CalendarAppointmentBooking = ({ onConfirm, onCancel }: CalendarAppointment
   const [date, setDate] = useState<Date | undefined>(new Date())
   const [selectedTime, setSelectedTime] = useState<string | null>(null)
 
-  const timeSlots = Array.from({ length: 37 }, (_, i) => {
+  const timeSlots = Array.from({ length: 33 }, (_, i) => {
     const totalMinutes = i * 15
     const hour = Math.floor(totalMinutes / 60) + 9
     const minute = totalMinutes % 60
@@ -69,7 +69,8 @@ const CalendarAppointmentBooking = ({ onConfirm, onCancel }: CalendarAppointment
           <div className='inset-y-0 right-0 flex w-full flex-col gap-4 border-t border-[#14213D]/5 max-md:h-60 md:absolute md:w-48 md:border-t-0 md:border-l'>
             <ScrollArea className='h-full'>
               <div className='flex flex-col gap-2 p-6'>
-                <span className="text-[10px] font-bold uppercase tracking-widest text-[#14213D]/40 mb-2">Available Slots</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#14213D]/40 mb-2">Available Slots</span>
+                <span className="text-[8px] font-bold text-[#2A9D8F]/60 uppercase tracking-widest mb-4">Africa/Lagos (GMT+1)</span>
                 {timeSlots.map(time => (
                   <Button
                     key={time}
@@ -97,12 +98,12 @@ const CalendarAppointmentBooking = ({ onConfirm, onCancel }: CalendarAppointment
                   <CircleCheckIcon className='size-5 stroke-[#2A9D8F]' />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[10px] font-bold uppercase text-[#14213D]/40 leading-none mb-1">Confirmation Details</span>
+                  <span className="text-[10px] font-bold uppercase text-[#14213D]/40 leading-none mb-1">Africa/Lagos Selection</span>
                   <span className="text-[#14213D] font-medium leading-tight">
                     {date?.toLocaleDateString('en-US', {
                       day: 'numeric',
                       month: 'long'
-                    })} at <span className='font-bold'>{selectedTime}</span>
+                    })} at <span className='font-bold'>{selectedTime} (WAT)</span>
                   </span>
                 </div>
               </>
