@@ -15,6 +15,7 @@ export default defineConfig(({ mode }) => {
       'process.env.VITE_VAPI_API_URL': JSON.stringify(env.VITE_VAPI_API_URL),
       'process.env.VITE_VAPI_WEB_TOKEN': JSON.stringify(env.VITE_VAPI_WEB_TOKEN),
       'process.env.VITE_VAPI_ASSISTANT_ID': JSON.stringify(env.VITE_VAPI_ASSISTANT_ID),
+      'process.env.VITE_VAPI_PRIVATE_API_KEY': JSON.stringify(env.VITE_VAPI_PRIVATE_API_KEY),
     },
     build: {
       chunkSizeWarningLimit: 1000,
