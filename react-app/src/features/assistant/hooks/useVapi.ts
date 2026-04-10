@@ -131,6 +131,11 @@ export function useVapi(options?: UseVapiOptions) {
     vapi.stop();
   }, []);
 
+  const clearMessages = useCallback(() => {
+    setMessages([]);
+    setActiveTranscript(null);
+  }, []);
+
   const toggleCall = useCallback(() => {
     if (callStatus === CallStatus.ACTIVE) {
       stop();
@@ -138,6 +143,10 @@ export function useVapi(options?: UseVapiOptions) {
       start();
     }
   }, [callStatus, start, stop]);
+
+  const addMessage = useCallback((message: Message) => {
+    setMessages((prev) => [...prev, message]);
+  }, []);
 
   return {
     isSpeechActive,
@@ -149,5 +158,7 @@ export function useVapi(options?: UseVapiOptions) {
     start,
     stop,
     toggleCall,
+    clearMessages,
+    addMessage,
   };
 }
